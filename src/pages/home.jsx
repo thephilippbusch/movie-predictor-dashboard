@@ -1,67 +1,146 @@
-import React from 'react';
-import {
-    Switch,
-    Route,
-    useHistory,
-    useRouteMatch
-} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { createCalculation } from '../api/graphql/calculation'
 
 import {
     Box, 
+    Button, 
+    Form,
+    FormField, 
     Heading,
-    Collapsible
+    TextInput,
+    Text
 } from 'grommet';
 
-import RevenueCalculator from './homepages/revenueCalc';
-import PopularityCalculator from './homepages/popularityCalc';
+import {
+    Services as ServicesIcon
+} from 'grommet-icons'
 
-const ClickBox = (props) => {
-    const history = useHistory()
+import Loader from '../components/loader'
+
+const Home = () => {
+    const [calculationData, setCalculationData] = useState()
+    const [result, setResult] = useState({ fetched: null, isFetching: false })
+
+    const submit = () => {
+        console.log(calculationData)
+        try {
+            setResult({ fetched: null, isFetching: true })
+            let creation_date = new Date()
+            let acting_list = []
+            Object.keys(calculationData).map(key => {
+                if(
+                    key === "acting-1" ||
+                    key === "acting-2" ||
+                    key === "acting-3"
+                ) {
+                    if(calculationData[key] !== "") {
+                        acting_list.push(parseInt(calculationData[key]))
+                    }
+                }
+            })
+
+            const payload = {
+                creation_date: creation_date.toISOString(),
+                used_budget: parseFloat(calculationData.budget),
+                acting: acting_list,
+                directing: parseInt(calculationData.directing),
+                companies: parseInt(calculationData.company)
+            }
+
+            createCalculation(payload)
+                .then(res => {
+                    if(res) {
+                        console.log(res)
+                        setResult({ fetched: res.createCalculation.calculation, isFetching: false })
+                    } else {
+                        setResult({ fetched: null, isFetching: false })
+                    }
+                })
+        } catch(e) {
+            console.error(e)
+            setResult({ fetched: null, isFetching: false })
+        }
+    }
+
+    const formatNumber = (num) => {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
     return (
-        <Box 
-            fill="horizontal" 
-            pad="small"
-            onClick={() => history.push(`${props.url}/${props.path}`)}
-            hoverIndicator={{color: "brand"}}
-        >
-            {props.name}
-        </Box>
-    )
-}
-
-const Home = (props) => {
-    let {path, url} = useRouteMatch()
-
-    return (
-        <Box direction="row" justify="start" height="91vh">
-            <Collapsible direction="horizontal" open={props.status}>
-                <Box width="medium" background="background-contrast" fill="vertical">
-                    <ClickBox 
-                        name='Create Revenue Calculation' 
-                        path='create-revenue-calc'
-                        url={url}
-                    />
-                    <ClickBox 
-                        name='Create Popularity Calculation'
-                        path='create-popularity-calc'
-                        url={url}
-                    />
+        <Box height="91vh" align="center">
+            <Box 
+                width="large" 
+                direction="column"
+                align="center"
+            >
+                <Heading level="2">Revenue Calculator</Heading>
+                <Box fill="horizontal" pad="medium">
+                    <Form
+                        onChange={(value) => {
+                            setCalculationData(value)
+                        }}
+                        onSubmit={() => submit()}
+                    >
+                        <Heading margin="none" level="4">Budget</Heading>
+                        <FormField name="budget" width="medium" required>
+                            <TextInput 
+                                name="budget" 
+                                type="number"
+                            />
+                        </FormField>
+                        <Heading margin="none" level="4">Acting</Heading>
+                        <FormField name="acting-1" width="medium" label="ActingID" required>
+                            <TextInput 
+                                name="acting-1"
+                                type="number"
+                            />
+                        </FormField>
+                        <FormField name="acting-2" width="medium">
+                            <TextInput 
+                                name="acting-2"
+                                type="number"
+                            />
+                        </FormField>
+                        <FormField name="acting-3" width="medium">
+                            <TextInput 
+                                name="acting-3"
+                                type="number"
+                            />
+                        </FormField>
+                        <Heading margin="none" level="4">Directing</Heading>
+                        <FormField name="directing" width="medium" label="DirectingID" required>
+                            <TextInput 
+                                name="directing"
+                                type="number"
+                            />
+                        </FormField>
+                        <Heading margin="none" level="4">Company</Heading>
+                        <FormField name="company" width="medium" label="CompanyID" required>
+                            <TextInput 
+                                name="company"
+                                type="number"
+                            />
+                        </FormField>
+                        <Box fill="horizontal" direction="row" justify="center" pad={{vertical: "small"}}>
+                            {result.isFetching ? (
+                                <Loader size="component"/>
+                            ) : (
+                                <Button 
+                                    primary
+                                    reverse
+                                    type="submit"
+                                    label="Create Calculation"
+                                    icon={<ServicesIcon />}
+                                />
+                            )}
+                        </Box>
+                        {result.fetched && (
+                            <Box>
+                                <Heading level="3" margin="none">Calculated Revenue: {formatNumber(result.fetched.calculatedRevenue)}$</Heading>
+                            </Box>
+                        )}
+                    </Form>
                 </Box>
-            </Collapsible>
-            <Box margin={{left: "medium"}}>
-                <Switch>
-                    <Route exact path={path}>
-                        <Heading level="5">This is the Clara Page!</Heading>
-                    </Route>
-
-                    <Route path={`${path}/create-revenue-calc`}>
-                        <RevenueCalculator />
-                    </Route>
-                    <Route path={`${path}/create-popularity-calc`}>
-                        <PopularityCalculator />
-                    </Route>
-                </Switch>
             </Box>
         </Box>
     )

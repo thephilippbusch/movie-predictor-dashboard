@@ -11,7 +11,13 @@ import {
     Heading,
     Box,
     Collapsible,
+    RadioButtonGroup
  } from 'grommet';
+
+ import {
+    Group as GroupIcon,
+    Organization as OrganizationIcon
+ } from 'grommet-icons'
 
 import SearchCompanies from './searchpages/searchCompanies';
 import SearchPeople from './searchpages/searchPeople';
@@ -33,18 +39,19 @@ const ClickBox = (props) => {
 
 const Search = (props) => {
     let {path, url} = useRouteMatch()
+    let history = useHistory()
 
     return (
-        <Box direction="row" justify="start" height="91vh" overflow={{horizontal: "scroll"}}>
+        <Box direction="row" justify="start" height="91vh" overflow={{horizontal: "auto"}}>
             <Collapsible direction="horizontal" open={props.status}>
                 <Box width="medium" background="background-contrast" fill="vertical">
                     <ClickBox 
-                        name='Manage People' 
+                        name='Search People' 
                         path='people'
                         url={url}
                     />
                     <ClickBox 
-                        name='Manage Companies'
+                        name='Search Companies'
                         path='companies'
                         url={url}
                     />
@@ -78,13 +85,13 @@ const Search = (props) => {
                                         {option === 'people' && (
                                             <Box direction="column" justify="center" align="center">
                                                 <GroupIcon size="large"/>
-                                                <Heading level="4" margin="none">Manage People</Heading>  
+                                                <Heading level="4" margin={{horizontal: "small"}} textAlign="center">Search People in Database</Heading>  
                                             </Box>
                                         )}
                                         {option === 'companies' && (
                                             <Box direction="column" justify="center" align="center">
-                                                <ServicesIcon size="large"/>
-                                                <Heading level="4" margin="none">Manage Companies</Heading>  
+                                                <OrganizationIcon size="large"/>
+                                                <Heading level="4" margin={{horizontal: "small"}} textAlign="center">Search Companies in Database</Heading>  
                                             </Box>
                                         )}
                                     </Box>

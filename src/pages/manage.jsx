@@ -17,7 +17,7 @@ import ManagePeople from './managepages/managePeople';
 import ManageCompanies from './managepages/manageCompanies';
 import {
     Group as GroupIcon,
-    Services as ServicesIcon
+    Organization as OrganizationIcon
 } from 'grommet-icons';
 
 const ClickBox = (props) => {
@@ -41,7 +41,7 @@ const ManageDB = (props) => {
     let history = useHistory();
 
     return (
-        <Box direction="row" justify="start" height="91vh" overflow={{horizontal: "scroll"}}>
+        <Box direction="row" justify="start" height="91vh" overflow={{horizontal: "auto"}}>
             <Collapsible direction="horizontal" open={props.status}>
                 <Box width="medium" background="background-contrast" fill="vertical">
                     <ClickBox 
@@ -84,13 +84,13 @@ const ManageDB = (props) => {
                                         {option === 'people' && (
                                             <Box direction="column" justify="center" align="center">
                                                 <GroupIcon size="large"/>
-                                                <Heading level="4" margin="none">Manage People</Heading>  
+                                                <Heading level="4" margin={{vertical: "medium"}}>Manage People</Heading>  
                                             </Box>
                                         )}
                                         {option === 'companies' && (
                                             <Box direction="column" justify="center" align="center">
-                                                <ServicesIcon size="large"/>
-                                                <Heading level="4" margin="none">Manage Companies</Heading>  
+                                                <OrganizationIcon size="large"/>
+                                                <Heading level="4" margin={{vertical: "medium"}}>Manage Companies</Heading>  
                                             </Box>
                                         )}
                                     </Box>
