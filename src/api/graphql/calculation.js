@@ -13,7 +13,8 @@ export const createCalculation = (payload) => {
                         acting,
                         directing,
                         companies,
-                        calculatedRevenue
+                        calculatedRevenue,
+                        factor
                     }
                 }
             }
