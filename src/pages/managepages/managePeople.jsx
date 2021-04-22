@@ -27,13 +27,15 @@ import Loader from '../../components/loader'
 
 import { 
     getPersonDetails, 
-    searchPeople
+    searchPeople,
+    getMovieCredits
 } from '../../api/tmdb/people'
 
 import {
     addPerson as addPersonToES,
     deletePerson as deletePersonFromES,
-    checkPersonExists
+    checkPersonExists,
+    updateMovieList
 } from '../../api/graphql/people'
 
 const defaultFilterValues = {
@@ -92,6 +94,37 @@ const Result = (props) => {
 
                                 addPersonToES(payload)
                                     .then(gqlres => {
+                                        getMovieCredits(payload.id)
+                                            .then(res => {
+                                                if(res) {
+                                                    let sortedMovielist = null;
+                                                    if(payload.knownForDep === "Acting") {
+                                                        sortedMovielist = res.data.cast.sort((a, b) => {
+                                                            return b.popularity - a.popularity
+                                                        })
+                                                    } else {
+                                                        sortedMovielist = res.data.crew.filter(movie => movie.department === payload.knownForDep).sort((a, b) => {
+                                                            return b.popularity - a.popularity
+                                                        })
+                                                    }
+                                                    if(sortedMovielist) {
+                                                        let newMovieList = []
+                                                        sortedMovielist.map((movie, index) => {
+                                                            if(index < 10) {
+                                                                newMovieList.push(movie.id)
+                                                            }
+                                                        })
+                                                        updateMovieList(payload.id, newMovieList)
+                                                            .then(res => {
+                                                                if(res) {
+                                                                    console.log(`Successfully updated movie list of ${payload.name}`)
+                                                                } else {
+                                                                    console.error("Could not update movie list, something went wrong")
+                                                                }
+                                                            })
+                                                    }
+                                                }
+                                            })
                                         if(gqlres.addPerson) {
                                             setExisting(true)
                                             setShowConfirmationCard({ show: true, msg: `'${payload.name}' was successfully added to the database`, color: 'status-ok' })

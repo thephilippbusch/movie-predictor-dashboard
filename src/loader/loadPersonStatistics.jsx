@@ -66,7 +66,7 @@ const LoadPersonStatistics = (props) => {
                                                     }
                                                 })
                                         }
-                                        if(props.movies.length - 1 === index) {
+                                        if(props.movies.length === movieDetails.length) {
                                             setData({ fetched: movieDetails, isFetching: false })
                                         }
                                     })
@@ -75,7 +75,7 @@ const LoadPersonStatistics = (props) => {
                         })
                 })
             }
-            fetchStatisticData()
+            let result = fetchStatisticData()
         } catch(e) {
             console.error(e)
             setData({ fetched: null, isFetching: false })
