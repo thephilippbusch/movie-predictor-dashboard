@@ -76,9 +76,6 @@ const Result = (props) => {
                         if(res.status === 200) {
                             console.log(res)
                             try {
-                                let popMovies = props.person.known_for.map(popMov => {
-                                    return popMov.id;
-                                });
                                 const payload = {
                                     id: res.data.id,
                                     imdbId: res.data.imdb_id,
@@ -87,57 +84,48 @@ const Result = (props) => {
                                     popularity: res.data.popularity,
                                     birthday: res.data.birthday,
                                     deathday: res.data.deathday,
-                                    popularMovieIDs: popMovies,
                                     imgPath: imgPath,
                                     gender: res.data.gender
                                 }
-
-                                addPersonToES(payload)
-                                    .then(gqlres => {
-                                        getMovieCredits(payload.id)
-                                            .then(res => {
-                                                if(res) {
-                                                    let sortedMovielist = null;
-                                                    if(payload.knownForDep === "Acting") {
-                                                        sortedMovielist = res.data.cast.sort((a, b) => {
-                                                            return b.popularity - a.popularity
-                                                        })
-                                                    } else {
-                                                        sortedMovielist = res.data.crew.filter(movie => movie.department === payload.knownForDep).sort((a, b) => {
-                                                            return b.popularity - a.popularity
-                                                        })
+                                getMovieCredits(payload.id)
+                                    .then(res => {
+                                        if(res) {
+                                            let sortedMovielist = null;
+                                            if(payload.knownForDep === "Acting") {
+                                                sortedMovielist = res.data.cast.sort((a, b) => {
+                                                    return b.popularity - a.popularity
+                                                })
+                                            } else {
+                                                sortedMovielist = res.data.crew.filter(movie => movie.department === payload.knownForDep).sort((a, b) => {
+                                                    return b.popularity - a.popularity
+                                                })
+                                            }
+                                            if(sortedMovielist) {
+                                                let newMovieList = []
+                                                sortedMovielist.map((movie, index) => {
+                                                    if(index < 10) {
+                                                        newMovieList.push(movie.id)
                                                     }
-                                                    if(sortedMovielist) {
-                                                        let newMovieList = []
-                                                        sortedMovielist.map((movie, index) => {
-                                                            if(index < 10) {
-                                                                newMovieList.push(movie.id)
-                                                            }
-                                                        })
-                                                        updateMovieList(payload.id, newMovieList)
-                                                            .then(res => {
-                                                                if(res) {
-                                                                    console.log(`Successfully updated movie list of ${payload.name}`)
-                                                                } else {
-                                                                    console.error("Could not update movie list, something went wrong")
-                                                                }
-                                                            })
-                                                    }
-                                                }
-                                            })
-                                        if(gqlres.addPerson) {
-                                            setExisting(true)
-                                            setShowConfirmationCard({ show: true, msg: `'${payload.name}' was successfully added to the database`, color: 'status-ok' })
-                                            setTimeout(() => {
-                                                setShowConfirmationCard({ show: false, msg: '', color: '' })
-                                            }, 3000)
-                                        } else {
-                                            setShowConfirmationCard({ show: true, msg: `'${payload.name}' already exists in the database`, color: 'status-critical' })
-                                            setTimeout(() => {
-                                                setShowConfirmationCard({ show: false, msg: '', color: '' })
-                                            }, 3000)
+                                                })
+                                                payload.popularMovieIDs = newMovieList
+                                                addPersonToES(payload)
+                                                    .then(gqlres => {
+                                                        if(gqlres.addPerson) {
+                                                            setExisting(true)
+                                                            setShowConfirmationCard({ show: true, msg: `'${payload.name}' was successfully added to the database`, color: 'status-ok' })
+                                                            setTimeout(() => {
+                                                                setShowConfirmationCard({ show: false, msg: '', color: '' })
+                                                            }, 3000)
+                                                        } else {
+                                                            setShowConfirmationCard({ show: true, msg: `'${payload.name}' already exists in the database`, color: 'status-critical' })
+                                                            setTimeout(() => {
+                                                                setShowConfirmationCard({ show: false, msg: '', color: '' })
+                                                            }, 3000)
+                                                        }
+                                                        setAddLoading(false)
+                                                })
+                                            }
                                         }
-                                        setAddLoading(false)
                                     })
                             } catch(e) {
                                 console.error(e)
