@@ -83,7 +83,7 @@ const Main = () => {
                   </Route>
                   <Route path='/manage'><ManageDB status={sidebarStatus}/></Route>
                   <Route path='/search'><Search status={sidebarStatus}/></Route>
-                  <Route path='/home'><LoadHome status={sidebarStatus}/></Route>
+                  <Route path='/home'><LoadHome/></Route>
                   <Route path='/impressum'><Impressum /></Route>
                   <Route path='/person/:id' render={({ match }) => <LoadPerson match={match}/>}/>
                   <Route exact path='/'><Redirect to='/home'/></Route>

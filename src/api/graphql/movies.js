@@ -3,7 +3,6 @@ import { GraphQLClient, gql } from 'graphql-request'
 const gqlClient = new GraphQLClient(`${process.env.REACT_APP_GRAPHQL_BASE_URL}/movies`)
 
 const stringify = (objectArray) => {
-    console.log(objectArray)
     let string = "["
     objectArray.map((obj, index) => {
         string += "{"

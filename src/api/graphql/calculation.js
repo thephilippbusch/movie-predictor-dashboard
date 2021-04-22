@@ -6,15 +6,16 @@ export const createCalculation = (payload) => {
     try {
         const mutation = gql`
             mutation {
-                createCalculation(usedBudget: ${payload.used_budget}, creationDate: "${payload.creation_date}", acting: [${payload.acting}], directing: ${payload.directing}, companies: ${payload.companies}) {
+                createCalculation(usedBudget: ${payload.used_budget}, creationDate: "${payload.creation_date}", acting: [${payload.acting}], directing: [${payload.directing}], companies: [${payload.companies}]) {
                     calculation {
                         usedBudget,
                         creationDate,
                         acting,
                         directing,
                         companies,
-                        calculatedRevenue,
-                        factor
+                        movies,
+                        factor,
+                        calculatedRevenue
                     }
                 }
             }

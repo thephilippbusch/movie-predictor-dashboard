@@ -122,3 +122,22 @@ export const updateMovieList = async (id, movies) => {
         return null
     }
 }
+
+export const getPeopleByDepartment = async (department) => {
+    try {
+        const query = gql`
+            query {
+                getPeople(knownForDep: "${department}") {
+                    id,
+                    name
+                }
+            }
+        `;
+
+        const response = await gqlClient.request(query)
+        return response
+    } catch(e) {
+        console.error(e)
+        return null
+    }
+}
