@@ -8,6 +8,7 @@ import {
 import styled from 'styled-components';
 import { Grommet, Main as MainContent } from 'grommet';
 import { global } from './styles/globalStylings';
+import 'newrelic'
 
 import LoadHome from './loader/loadHome';
 import LoadPerson from './loader/loadPerson';
