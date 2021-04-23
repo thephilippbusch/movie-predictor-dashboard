@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import Main from './main';
 import reportWebVitals from './reportWebVitals';
-require('newrelic')
 
 ReactDOM.render(
   <React.StrictMode>
