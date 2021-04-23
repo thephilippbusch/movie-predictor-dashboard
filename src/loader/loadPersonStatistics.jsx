@@ -17,7 +17,7 @@ const LoadPersonStatistics = (props) => {
             setData({ fetched: null, isFetching: true })
             const fetchStatisticData = async () => {
                 const movieDetails = []
-                props.movies.map((movie, index) => {
+                props.movies.map(movie => {
                     getMovieDetails(movie.id)
                         .then(res => {
                             if(res) {

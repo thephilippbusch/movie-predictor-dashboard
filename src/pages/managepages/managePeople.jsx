@@ -31,12 +31,21 @@ import {
     getMovieCredits
 } from '../../api/tmdb/people'
 
+import { 
+    getMovieDetails,
+    getMovieExternalIDs
+} from '../../api/tmdb/movies'
+
 import {
     addPerson as addPersonToES,
     deletePerson as deletePersonFromES,
-    checkPersonExists,
-    updateMovieList
+    checkPersonExists
 } from '../../api/graphql/people'
+
+import {
+    checkMovie as checkMovieInES,
+    addMovie as addMovieToES
+} from '../../api/graphql/movies'
 
 const defaultFilterValues = {
     role: "All",
@@ -108,6 +117,58 @@ const Result = (props) => {
                                                     }
                                                 })
                                                 payload.popularMovieIDs = newMovieList
+                                                newMovieList.map(movie => {
+                                                    getMovieDetails(movie)
+                                                        .then(res => {
+                                                            if(res) {
+                                                                let productionComps = res.data.production_companies.map(company => {
+                                                                    return {
+                                                                        id: company.id,
+                                                                        name: company.name
+                                                                    }
+                                                                })
+                                
+                                                                let payload = {
+                                                                    title: res.data.title,
+                                                                    id: res.data.id,
+                                                                    imdbId: res.data.imdb_id,
+                                                                    budget: res.data.budget,
+                                                                    revenue: res.data.revenue,
+                                                                    runtime: res.data.runtime,
+                                                                    popularity: res.data.popularity,
+                                                                    vote: res.data.vote_average,
+                                                                    voteCount: res.data.vote_count,
+                                                                    genres: res.data.genres,
+                                                                    productionCompanies: productionComps
+                                                                }
+                                
+                                                                getMovieExternalIDs(movie)
+                                                                    .then(res => {
+                                                                        if(res) {
+                                                                            payload.twitter_id = res.data.twitter_id
+                                                                            checkMovieInES(payload.id)
+                                                                                .then(res => {
+                                                                                    if(res) {
+                                                                                        if(!res.checkMovie.doesExist) {
+                                                                                            addMovieToES(payload)
+                                                                                                .then(res => {
+                                                                                                    if(res) {
+                                                                                                        console.log(res)
+                                                                                                    } else {
+                                                                                                        console.error("Something went wrong!")
+                                                                                                    }
+                                                                                                })
+                                                                                        } else {
+                                                                                            console.log("Movie already exists in ES")
+                                                                                        }
+                                                                                    }
+                                                                                })
+                                                                        }
+                                                                    })
+                                                            }
+                                                            
+                                                        })
+                                                })
                                                 addPersonToES(payload)
                                                     .then(gqlres => {
                                                         if(gqlres.addPerson) {
